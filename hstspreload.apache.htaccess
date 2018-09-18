@@ -1,0 +1,20 @@
+# For more HTTPS config recommendations, see
+# https://mozilla.github.io/server-side-tls/ssl-config-generator/
+
+# Note that the directives below are *not* guarded by `IfModule`. This ensures
+# that a request *fails* if it cannot be served with the intended security.
+
+# Set the HSTS header
+# - `always`: Set header regardless of response code
+# - `63072000`: 2 years (expressed as seconds)
+# - `preload`: https://hstspreload.org/
+# - `env=HTTPS`: Only send header over HTTPS, not HTTP
+Header always set Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" env=HTTPS
+
+# Redirect non-HTTPS to HTTPS on the same domain.
+# For Apache documentation, see https://httpd.apache.org/docs/2.4/rewrite/flags.html
+# - `R=301`: Permanent redirect. (Optional: Consider using 308 instead.)
+# - `L`: Immediately redirect without processing more rules.
+RewriteEngine on
+RewriteCond %{HTTPS} off
+RewriteRule ^/?(.*) https://%{SERVER_NAME}/$1 [R=301,L]
